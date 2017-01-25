@@ -17,20 +17,20 @@
 package mountstat
 
 import (
-    "fmt"
-    "io"
-    "sort"
+	"fmt"
+	"io"
+	"sort"
 )
 
 type OpStats map[string]uint64
 
 type NFSStats struct {
-	Remote  string
-	Local   string
-	Events  OpStats
-	Bytes   OpStats
-	XPRT    OpStats
-	Ops     map[string]OpStats
+	Remote string
+	Local  string
+	Events OpStats
+	Bytes  OpStats
+	XPRT   OpStats
+	Ops    map[string]OpStats
 }
 
 var eventLabels = []string{
@@ -64,16 +64,16 @@ var eventLabels = []string{
 }
 
 func printEventUsage(w io.Writer) {
-    fmt.Fprintf(w, "\033[1mEVENT STATISTICS\033[0m\n\n")
-    fmt.Fprint(w, "Configuration Example\n")
-    fmt.Fprint(w, "    events:\n")
-    fmt.Fprint(w, "        -shortread\n")
-    fmt.Fprint(w, "        -shortwrite\n")
-    fmt.Fprint(w, "\nAvailable Stats:\n")
-    sort.Strings(eventLabels)
-    for _,l := range eventLabels {
-    fmt.Fprintf(w, "    %s\n",l)
-    }
+	fmt.Fprintf(w, "\033[1mEVENT STATISTICS\033[0m\n\n")
+	fmt.Fprint(w, "Configuration Example\n")
+	fmt.Fprint(w, "    events:\n")
+	fmt.Fprint(w, "        -shortread\n")
+	fmt.Fprint(w, "        -shortwrite\n")
+	fmt.Fprint(w, "\nAvailable Stats:\n")
+	sort.Strings(eventLabels)
+	for _, l := range eventLabels {
+		fmt.Fprintf(w, "    %s\n", l)
+	}
 }
 
 var byteLabels = []string{
@@ -88,19 +88,36 @@ var byteLabels = []string{
 }
 
 func printByteUsage(w io.Writer) {
-    fmt.Fprint(w, "\033[1mBYTE STATISTICS\033[0m\n\n")
-    fmt.Fprint(w, "Configuration Example\n")
-    fmt.Fprint(w, "    byte:\n")
-    fmt.Fprint(w, "        -readpages\n")
-    fmt.Fprint(w, "        -writepages\n")
-    fmt.Fprint(w, "\nAvailable Stats:\n")
-    sort.Strings(byteLabels)
-    for _,l := range byteLabels {
-    fmt.Fprintf(w, "    %s\n",l)
-    }
+	fmt.Fprint(w, "\033[1mBYTE STATISTICS\033[0m\n\n")
+	fmt.Fprint(w, "Configuration Example\n")
+	fmt.Fprint(w, "    byte:\n")
+	fmt.Fprint(w, "        -readpages\n")
+	fmt.Fprint(w, "        -writepages\n")
+	fmt.Fprint(w, "\nAvailable Stats:\n")
+	sort.Strings(byteLabels)
+	for _, l := range byteLabels {
+		fmt.Fprintf(w, "    %s\n", l)
+	}
 }
 
+var xprtKeys = []string{
+	"protocol",
+	"srcport",
+	"bind_count",
+	"connect_count",
+	"connect_time",
+	"idle_time",
+	"rpcsends",
+	"rpcrecvs",
+	"badxids",
+	"req_u",
+	"bklog_u",
+	"max_slots",
+	"sending_u",
+	"pending_u",
+}
 var xprtLabels = map[string]string{
+	"protocol":      "Connection protocol",
 	"srcport":       "Ephemeral port",
 	"bind_count":    "How many rpcbind operations",
 	"connect_count": "How many TCP connects",
@@ -117,22 +134,28 @@ var xprtLabels = map[string]string{
 }
 
 func printXprtUsage(w io.Writer) {
-    fmt.Fprint(w, "\033[1mXPRT STATISTICS\033[0m\n\n")
-    fmt.Fprint(w, "Configuration Example\n")
-    fmt.Fprint(w, "    xprt:\n")
-    fmt.Fprint(w, "        -req_u\n")
-    fmt.Fprint(w, "        -bklog_u\n")
-    fmt.Fprint(w, "\nAvailable Stats:\n")
-    var xprtKeys []string
-    for k := range xprtLabels {
-       xprtKeys = append(xprtKeys,k)
-    }
-    sort.Strings(xprtKeys)
-    for _,l := range xprtKeys {
-    fmt.Fprintf(w, "    %14s - %s\n",l,xprtLabels[l])
-    }
+	fmt.Fprint(w, "\033[1mXPRT STATISTICS\033[0m\n\n")
+	fmt.Fprint(w, "Configuration Example\n")
+	fmt.Fprint(w, "    xprt:\n")
+	fmt.Fprint(w, "        -req_u\n")
+	fmt.Fprint(w, "        -bklog_u\n")
+	fmt.Fprint(w, "\nAvailable Stats:\n")
+	sort.Strings(xprtKeys)
+	for _, l := range xprtKeys {
+		fmt.Fprintf(w, "    %14s - %s\n", l, xprtLabels[l])
+	}
 }
 
+var rpcKeys = []string{
+    "ops",
+    "trans",
+    "timeouts",
+    "bytes_sent",
+    "bytes_recv",
+    "queue",
+    "rtt",
+    "execute",
+}
 
 var rpcLabels = map[string]string{
 	"ops":        "How many ops of this type have been requested",
@@ -146,34 +169,29 @@ var rpcLabels = map[string]string{
 }
 
 func printRPCUsage(w io.Writer) {
-    fmt.Fprint(w, "\033[1mRPC STATISTICS\033[0m\n\n")
-    fmt.Fprint(w, "Configuration Example\n")
-    fmt.Fprint(w, "    rpc:\n")
-    fmt.Fprint(w, "        READ:\n")
-    fmt.Fprint(w, "            -ops\n")
-    fmt.Fprint(w, "            -trans\n")
-    fmt.Fprint(w, "            -timeouts\n")
-    fmt.Fprint(w, "        WRITE:\n")
-    fmt.Fprint(w, "            -ops\n")
-    fmt.Fprint(w, "            -trans\n")
-    fmt.Fprint(w, "\nAvailable Stats:\n")
-    var rpcKeys []string
-    for k := range rpcLabels {
-       rpcKeys = append(rpcKeys,k)
-    }
-    sort.Strings(rpcKeys)
-    for _,l := range rpcKeys {
-    fmt.Fprintf(w, "    %10s - %s\n",l,rpcLabels[l])
-    }
+	fmt.Fprint(w, "\033[1mRPC STATISTICS\033[0m\n\n")
+	fmt.Fprint(w, "Configuration Example\n")
+	fmt.Fprint(w, "    rpc:\n")
+	fmt.Fprint(w, "        READ:\n")
+	fmt.Fprint(w, "            -ops\n")
+	fmt.Fprint(w, "            -trans\n")
+	fmt.Fprint(w, "            -timeouts\n")
+	fmt.Fprint(w, "        WRITE:\n")
+	fmt.Fprint(w, "            -ops\n")
+	fmt.Fprint(w, "            -trans\n")
+	fmt.Fprint(w, "\nAvailable Stats:\n")
+	sort.Strings(rpcKeys)
+	for _, l := range rpcKeys {
+		fmt.Fprintf(w, "    %10s - %s\n", l, rpcLabels[l])
+	}
 }
 
-
 func PrintStatUsage(w io.Writer) {
-    printEventUsage(w)
-    fmt.Fprintln(w,"")
-    printByteUsage(w)
-    fmt.Fprintln(w,"")
-    printXprtUsage(w)
-    fmt.Fprintln(w,"")
-    printRPCUsage(w)
+	printEventUsage(w)
+	fmt.Fprintln(w, "")
+	printByteUsage(w)
+	fmt.Fprintln(w, "")
+	printXprtUsage(w)
+	fmt.Fprintln(w, "")
+	printRPCUsage(w)
 }

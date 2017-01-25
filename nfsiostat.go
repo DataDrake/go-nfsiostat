@@ -17,28 +17,20 @@
 package main
 
 import (
-    "bufio"
-    "fmt"
+	"fmt"
 	"github.com/DataDrake/go-nfsiostat/mountstat"
     "io"
 	"os"
 )
 
 func main() {
-    mountstat.PrintStatUsage(os.Stdout)
-    b := bufio.NewReader(os.Stdin)
-    for {
-        n,e := mountstat.ReadNFSStat(b)
-        if e == mountstat.NotNFS {
-            continue
-        }
-        if n == nil {
-            os.Exit(2)
-        } else {
-            fmt.Printf("%v\n", n.Ops)
-        }
-        if e == io.EOF {
-            return
-        }
+	stats, err := mountstat.ReadMountStats()
+	if err != nil && err != io.EOF {
+		println(err.Error())
+		os.Exit(1)
+	}
+    for _,s := range stats {
+	    fmt.Printf("%v\n", s)
     }
+	mountstat.PrintStatUsage(os.Stdout)
 }
