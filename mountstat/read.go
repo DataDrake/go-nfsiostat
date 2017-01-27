@@ -19,7 +19,7 @@ package mountstat
 import (
 	"bufio"
 	"errors"
-    "io"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -27,7 +27,8 @@ import (
 
 var line string
 
-var notStatLine = errors.New("Not a Stat Line")
+// ErrNotStatLine is an internal error for reporting the end of the RPC stats section
+var ErrNotStatLine = errors.New("Not a Stat Line")
 
 func readLine(b *bufio.Reader) (err error) {
 	line, err = b.ReadString('\n')
@@ -52,10 +53,10 @@ func parseStatLine(b *bufio.Reader, labels []string) (key string, stats OpStats,
 		return
 	}
 	kv := strings.Split(line, ":")
-    if len(kv) != 2 {
-        err = notStatLine
-        return
-    }
+	if len(kv) != 2 {
+		err = ErrNotStatLine
+		return
+	}
 	key = strings.TrimSpace(kv[0])
 	stats = make(OpStats)
 	vs := strings.Split(strings.TrimSpace(kv[1]), " ")
@@ -68,11 +69,11 @@ func parseStatLine(b *bufio.Reader, labels []string) (key string, stats OpStats,
 func (n *NFSStats) readOps(b *bufio.Reader) (err error) {
 	n.Ops = make(map[string]OpStats)
 	for {
-		op, stats, e := parseStatLine(b,rpcKeys)
+		op, stats, e := parseStatLine(b, rpcKeys)
 		if e != nil {
-            if e != notStatLine {
-    			err = e
-            }
+			if e != ErrNotStatLine {
+				err = e
+			}
 			return
 		}
 		if len(op) == 0 {
@@ -82,7 +83,7 @@ func (n *NFSStats) readOps(b *bufio.Reader) (err error) {
 	}
 }
 
-func ReadNFSStat(b *bufio.Reader) (n *NFSStats, err error) {
+func parseNFSStat(b *bufio.Reader) (n *NFSStats, err error) {
 	if len(line) == 0 {
 		//Read Mount Description line
 		err = readLine(b)
@@ -102,12 +103,12 @@ func ReadNFSStat(b *bufio.Reader) (n *NFSStats, err error) {
 		}
 	}
 	//Read Event Stats
-	_, n.Events, err = parseStatLine(b,eventLabels)
+	_, n.Events, err = parseStatLine(b, eventLabels)
 	if err != nil {
 		return
 	}
 	//Read Byte Stats
-	_, n.Bytes, err = parseStatLine(b,byteLabels)
+	_, n.Bytes, err = parseStatLine(b, byteLabels)
 	if err != nil {
 		return
 	}
@@ -117,7 +118,7 @@ func ReadNFSStat(b *bufio.Reader) (n *NFSStats, err error) {
 		return
 	}
 	//Read XPRT Stats
-	_, n.XPRT, err = parseStatLine(b,xprtKeys)
+	_, n.XPRT, err = parseStatLine(b, xprtKeys)
 	if err != nil {
 		return
 	}
@@ -131,6 +132,7 @@ func ReadNFSStat(b *bufio.Reader) (n *NFSStats, err error) {
 	return
 }
 
+// ReadMountStats gets all of the NFS entries in /proc/self/mountstats
 func ReadMountStats() (stats []*NFSStats, err error) {
 	f, err := os.Open("/proc/self/mountstats")
 	if err != nil {
@@ -141,13 +143,13 @@ func ReadMountStats() (stats []*NFSStats, err error) {
 	stats = make([]*NFSStats, 0)
 	for {
 		line = ""
-		stat, e := ReadNFSStat(b)
-        if e != nil {
-            if e != io.EOF {
-                err = e
-            }
-            return
-        }
+		stat, e := parseNFSStat(b)
+		if e != nil {
+			if e != io.EOF {
+				err = e
+			}
+			return
+		}
 		if stat == nil {
 			continue
 		}

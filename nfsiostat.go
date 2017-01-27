@@ -19,7 +19,7 @@ package main
 import (
 	"fmt"
 	"github.com/DataDrake/go-nfsiostat/mountstat"
-    "io"
+	"io"
 	"os"
 )
 
@@ -29,8 +29,8 @@ func main() {
 		println(err.Error())
 		os.Exit(1)
 	}
-    for _,s := range stats {
-	    fmt.Printf("%v\n", s)
-    }
+	for _, s := range stats {
+		fmt.Printf("%v\n", s)
+	}
 	mountstat.PrintStatUsage(os.Stdout)
 }

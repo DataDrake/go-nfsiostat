@@ -22,8 +22,10 @@ import (
 	"sort"
 )
 
+// OpStats is a map of RPC statistics for each RPC method
 type OpStats map[string]uint64
 
+// NFSStats is an struct representation of an NFS entry in /proc/self/mountstats
 type NFSStats struct {
 	Remote string
 	Local  string
@@ -147,14 +149,14 @@ func printXprtUsage(w io.Writer) {
 }
 
 var rpcKeys = []string{
-    "ops",
-    "trans",
-    "timeouts",
-    "bytes_sent",
-    "bytes_recv",
-    "queue",
-    "rtt",
-    "execute",
+	"ops",
+	"trans",
+	"timeouts",
+	"bytes_sent",
+	"bytes_recv",
+	"queue",
+	"rtt",
+	"execute",
 }
 
 var rpcLabels = map[string]string{
@@ -186,6 +188,7 @@ func printRPCUsage(w io.Writer) {
 	}
 }
 
+// PrintStatUsage prints out the configuration documentation for the NFSStats
 func PrintStatUsage(w io.Writer) {
 	printEventUsage(w)
 	fmt.Fprintln(w, "")
