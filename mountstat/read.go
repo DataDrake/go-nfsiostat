@@ -61,7 +61,7 @@ func parseStatLine(b *bufio.Reader, labels []string) (key string, stats OpStats,
 	stats = make(OpStats)
 	vs := strings.Split(strings.TrimSpace(kv[1]), " ")
 	for i, v := range vs {
-		stats[labels[i]], _ = strconv.ParseUint(v, 10, 64)
+		stats[labels[i]], _ = strconv.ParseInt(v, 10, 64)
 	}
 	return
 }

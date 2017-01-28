@@ -23,7 +23,7 @@ import (
 )
 
 // OpStats is a map of RPC statistics for each RPC method
-type OpStats map[string]uint64
+type OpStats map[string]int64
 
 // NFSStats is an struct representation of an NFS entry in /proc/self/mountstats
 type NFSStats struct {
