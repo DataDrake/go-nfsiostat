@@ -18,7 +18,7 @@ Lots of companies use NFS for accessing data, but it can be difficult to capture
  
 ## License
  
-Copyright © 2017 Bryan T. Meyers <bmeyers@datadrake.com>
+Copyright 2017 Bryan T. Meyers <bmeyers@datadrake.com>
  
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
